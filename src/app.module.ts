@@ -1,26 +1,20 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { TasksModule } from './tasks/tasks.module';
-import { Task } from './tasks/tasks.entity';
-// import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { User } from './users/users.entity';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { DatabaseModule } from './database/database.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    SequelizeModule.forRoot({
-      dialect: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'to_do_list',
-      models: [Task, User],
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
+    DatabaseModule,
     TasksModule,
     AuthModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
