@@ -21,7 +21,7 @@ export const databaseProviders = [
         },
       });
       sequelize.addModels([Task, User]);
-      await sequelize.sync();
+      // await sequelize.sync();
       return sequelize;
     },
   },
