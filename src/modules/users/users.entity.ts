@@ -1,6 +1,16 @@
-import { IsString, IsEmpty } from 'class-validator';
-import { Table, Column, Model, HasMany } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  HasMany,
+  BeforeCreate,
+  BelongsTo,
+  BeforeUpdate,
+  BeforeDestroy,
+} from 'sequelize-typescript';
 import { Task } from '../tasks/tasks.entity';
+import { Inject } from '@nestjs/common';
+import { Request } from 'express';
 
 @Table({
   tableName: 'users',
@@ -23,6 +33,21 @@ export class User extends Model<User> {
   @Column({ defaultValue: 'user' })
   role: string;
 
-  @HasMany(() => Task)
-  tasks: Task[];
+  @Column
+  created_by: number;
+
+  @Column
+  updated_by: number;
+
+  @Column
+  deleted_by: number;
+
+  @Column
+  created_at: Date;
+
+  @Column
+  updated_at: Date;
+
+  @Column
+  deleted_at: Date;
 }

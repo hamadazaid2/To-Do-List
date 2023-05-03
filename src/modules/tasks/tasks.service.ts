@@ -10,12 +10,18 @@ import { Task } from './tasks.entity';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { TASKS_REPOSITORY } from '../common/constants/constant';
+import { User } from '../users/users.entity';
 
 @Injectable()
 export class TasksService {
   constructor(@Inject(TASKS_REPOSITORY) private taskRepository: typeof Task) {}
   async getAll(userId: number) {
-    return await this.taskRepository.findAll({ where: { user_id: userId } });
+    return await this.taskRepository.findAll({
+      where: { user_id: userId },
+      include: [
+        { model: User, attributes: ['id', 'first_name', 'last_name', 'email'] },
+      ],
+    });
   }
 
   async getOne(id: number, userId: number) {
@@ -24,6 +30,7 @@ export class TasksService {
         id: id,
         user_id: userId,
       },
+      include: [{ model: User }],
     });
 
     if (!task) throw new NotFoundException('No task founded!');

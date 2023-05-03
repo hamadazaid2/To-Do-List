@@ -14,6 +14,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { EditUserDto } from './dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { User } from './users.entity';
+import { parse } from 'path';
 
 @UseGuards(AuthGuard, AdminGuard)
 @Controller('users')
@@ -30,17 +33,27 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto);
+  create(
+    @Param('id', ParseIntPipe) userCreatedId: number,
+    @Body() dto: CreateUserDto,
+  ) {
+    return this.userService.create(userCreatedId, dto);
   }
 
   @Patch('/:id')
-  update(@Param('id', ParseIntPipe) id: number, dto: EditUserDto) {
-    return this.userService.update(id, dto);
+  update(
+    @GetUser('id', ParseIntPipe) userUpdatedId,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: EditUserDto,
+  ) {
+    return this.userService.update(userUpdatedId, id, dto);
   }
 
   @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.delete(id);
+  delete(
+    @GetUser('id', ParseIntPipe) userDeletedBy: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.userService.delete(userDeletedBy, id);
   }
 }

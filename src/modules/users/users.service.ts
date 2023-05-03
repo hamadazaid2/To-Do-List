@@ -31,27 +31,33 @@ export class UsersService {
     return user;
   }
 
-  async create(dto: CreateUserDto) {
+  async create(userCreatedId: number, dto: CreateUserDto) {
     const user = await this.userRepository.findOne({
       where: { email: dto.email },
     });
 
-    if (user.first_name) throw new ConflictException('Email already exists!');
-    return this.userRepository.create(dto);
+    if (user?.first_name) throw new ConflictException('Email already exists!');
+    return this.userRepository.create({ ...dto, created_by: userCreatedId });
   }
 
-  async update(id: number, dto: EditUserDto) {
+  async update(userUpdatedId: number, id: number, dto: EditUserDto) {
     const user = await this.userRepository.findByPk(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
-    await user.update(dto);
+    console.log(dto);
+    await user.update({
+      ...dto,
+      updated_by: userUpdatedId,
+      updated_at: new Date(),
+    });
 
     return user;
   }
 
-  async delete(id: number) {
+  async delete(userDeletedId: number, id: number) {
     const user = await this.userRepository.findByPk(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+    await user.update({ deleted_by: userDeletedId });
     await user.destroy();
   }
 }

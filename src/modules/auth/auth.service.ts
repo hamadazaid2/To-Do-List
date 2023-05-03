@@ -2,12 +2,13 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  Res,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { SignupDto } from './dto';
 import { UsersService } from '../users/users.service';
+import { GetUser } from '../common/decorators/get-user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(dto: SignupDto) {
+  async signup(
+    @GetUser('id', ParseIntPipe) userCreatedId: number,
+    dto: SignupDto,
+  ) {
     // Generate (hash) the password
     dto.password = await argon.hash(dto.password);
 
@@ -24,7 +28,7 @@ export class AuthService {
 
     try {
       // In signup, DTO will not add the role preoerty and delete it with whiteList
-      const user = await this.userService.create({ ...dto });
+      const user = await this.userService.create(userCreatedId, { ...dto });
       return this.signToken(user.id, user.email);
     } catch (err) {
       throw err;
@@ -33,7 +37,6 @@ export class AuthService {
 
   async signin(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
-    console.log(user);
     if (!user) {
       throw new NotFoundException('No user with that email!');
     }

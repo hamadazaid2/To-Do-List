@@ -19,8 +19,10 @@ export class AdminGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
+    console.log('iam here');
     if (request.user.role === 'user') throw new UnauthorizedException();
+    console.log('OK');
+
     return true;
   }
 }

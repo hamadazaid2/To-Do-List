@@ -8,7 +8,11 @@ import {
 } from 'sequelize-typescript';
 import { User } from '../users/users.entity';
 
-@Table({ tableName: 'tasks' })
+@Table({
+  tableName: 'tasks',
+  paranoid: true, // enable soft delete
+  underscored: true,
+})
 export class Task extends Model<Task> {
   @Column
   name: string;
