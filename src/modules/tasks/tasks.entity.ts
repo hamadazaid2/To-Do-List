@@ -34,4 +34,22 @@ export class Task extends Model<Task> {
 
   @ForeignKey(() => User)
   user_id: number;
+
+  @Column
+  created_by: number;
+
+  @Column
+  updated_by: number;
+
+  @Column
+  deleted_by: number;
+
+  @Column
+  created_at: Date;
+
+  @Column
+  updated_at: Date;
+
+  @Column
+  deleted_at: Date;
 }

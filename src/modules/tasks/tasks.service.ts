@@ -38,7 +38,11 @@ export class TasksService {
   }
 
   create(@Body() dto: CreateTaskDto, userId: number) {
-    return this.taskRepository.create({ ...dto, user_id: userId });
+    return this.taskRepository.create({
+      ...dto,
+      user_id: userId,
+      created_by: userId,
+    });
   }
 
   async update(
@@ -54,7 +58,7 @@ export class TasksService {
     });
     if (!task) throw new NotFoundException(`Task with ID ${id} not found`);
 
-    await task.update(dto);
+    await task.update({ ...dto, updated_by: userId, updated_at: new Date() });
 
     return task;
   }
@@ -67,6 +71,7 @@ export class TasksService {
       },
     });
     if (!task) throw new NotFoundException(`Task with ID ${id} not found`);
+    await task.update({ deleted_by: userId, deleted_at: new Date() });
     await task.destroy();
   }
 }
