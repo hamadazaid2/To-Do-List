@@ -6,13 +6,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-
-enum TaskStatus {
-  QA = 'QA',
-  WAITING = 'waiting',
-  IN_PROGRESS = 'in_progress',
-  DONE = 'done',
-}
+import { Transform } from 'class-transformer';
 
 export class UpdateTaskDto {
   @IsString()
@@ -23,17 +17,20 @@ export class UpdateTaskDto {
   @IsOptional()
   description?: string;
 
+  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsOptional()
   @Min(1)
   @Max(5)
   priority?: number;
 
+  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsOptional()
   expected_working_minutes?: number;
 
-  @IsEnum(TaskStatus)
+  @Transform(({ value }) => String(value).toUpperCase())
+  @IsEnum(['QA', 'DONE', 'WAITING', 'IN PROGRESS'])
   @IsOptional()
   status?: string;
 }
