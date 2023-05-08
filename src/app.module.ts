@@ -8,10 +8,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { DatabaseModule } from './database/database.module';
+import { DatabaseModule } from './modules/database/database.module';
 import { ConfigModule } from '@nestjs/config';
-import { AuthGuard } from './modules/common/guards/auth.guard';
+import { AuthGuard } from './common/guards/auth.guard';
 import { UsersModule } from './modules/users/users.module';
+import { UsersService } from './modules/users/services/users.service';
 
 @Module({
   imports: [
@@ -27,12 +28,4 @@ import { UsersModule } from './modules/users/users.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  //implements NestModule
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(AuthGuard)
-  //     .forRoutes({ path: '*', method: RequestMethod.ALL })
-  //     .apply();
-  // }
-}
+export class AppModule {}

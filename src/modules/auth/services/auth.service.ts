@@ -2,13 +2,14 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { SignupDto } from './dto';
-import { UsersService } from '../users/users.service';
-import { GetUser } from '../common/decorators/get-user.decorator';
+import { SignupDto } from '../dto';
+import { UsersService } from '../../users/services/users.service';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class AuthService {
@@ -18,17 +19,20 @@ export class AuthService {
   ) {}
 
   async signup(
-    @GetUser('id', ParseIntPipe) userCreatedId: number,
+    @GetUser('id') userCreatedId: number,
     dto: SignupDto,
+    transaction: Transaction,
   ) {
     // Generate (hash) the password
     dto.password = await argon.hash(dto.password);
-
     // Save the new user in DB
-
     try {
       // In signup, DTO will not add the role preoerty and delete it with whiteList
-      const user = await this.userService.create(userCreatedId, { ...dto });
+      const user = await this.userService.create(
+        userCreatedId,
+        { ...dto },
+        transaction,
+      );
       return this.signToken(user.id, user.email);
     } catch (err) {
       throw err;
