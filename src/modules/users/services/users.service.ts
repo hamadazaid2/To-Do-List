@@ -18,7 +18,7 @@ export class UsersService {
     return await this.userRepository.findAll();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.userRepository.findByPk(id);
     if (!user) throw new NotFoundException('No user founded!');
 
@@ -31,24 +31,37 @@ export class UsersService {
   }
 
   async create(
-    userCreatedId: number,
+    userCreatedId: string,
     dto: CreateUserDto,
-    transaction: Transaction,
+    transaction: Transaction
   ) {
     const user = await this.userRepository.findOne({
       where: { email: dto.email },
     });
 
     if (user) throw new ConflictException('Email already exists!');
-    return this.userRepository.create(
-      { ...dto, role: 'user', created_by: userCreatedId },
+
+
+    const newUser = await this.userRepository.create(
+      { ...dto, createdBy: userCreatedId},
       { transaction },
     );
+
+    console.log(newUser.createdBy)
+    if(newUser.createdBy === null){
+      newUser.createdBy = newUser.id;
+      newUser.update({createdBy: newUser.id},{transaction});
+    }
+
+    newUser.createdBy = String(
+      newUser.createdBy === null ? newUser.createdBy : newUser.id,
+    );
+    return newUser;
   }
 
   async update(
-    userUpdatedId: number,
-    id: number,
+    userUpdatedId: string,
+    id: string,
     dto: EditUserDto,
     transaction: Transaction,
   ) {
@@ -58,8 +71,8 @@ export class UsersService {
     await user.update(
       {
         ...dto,
-        updated_by: userUpdatedId,
-        updated_at: new Date(),
+        updatedBy: userUpdatedId,
+        updatedAt: new Date(),
       },
       { transaction },
     );
@@ -67,10 +80,10 @@ export class UsersService {
     return user;
   }
 
-  async delete(userDeletedId: number, id: number, transaction: Transaction) {
+  async delete(userDeletedId: string, id: string, transaction: Transaction) {
     const user = await this.userRepository.findByPk(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
-    await user.update({ deleted_by: userDeletedId }, { transaction });
+    await user.update({ deletedBy: userDeletedId }, { transaction });
     await user.destroy({ transaction });
   }
 }

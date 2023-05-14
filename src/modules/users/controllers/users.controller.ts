@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Param,
   Body,
@@ -12,14 +12,16 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { EditUserDto } from '../dto';
+import { EditUserDto, UserDto } from '../dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AdminGuard } from 'src/common/guards/admin.guard';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { Transaction } from 'sequelize';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
+import { Serialize } from '../../../common/interceptors';
 
+@Serialize(UserDto)
 @UseGuards(AuthGuard, AdminGuard)
 @Controller('users')
 export class UsersController {
@@ -30,14 +32,14 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.findOne(id);
   }
 
   @UseInterceptors(TransactionInterceptor)
   @Post()
   create(
-    @GetUser('id') userCreatedId: number,
+    @GetUser('id') userCreatedId: string,
     @Body() dto: CreateUserDto,
     @TransactionParam() transaction: Transaction,
   ) {
@@ -48,7 +50,7 @@ export class UsersController {
   @Patch('/:id')
   update(
     @GetUser('id') userUpdatedId,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: EditUserDto,
     @TransactionParam() transaction: Transaction,
   ) {
@@ -58,8 +60,8 @@ export class UsersController {
   @UseInterceptors(TransactionInterceptor)
   @Delete('/:id')
   delete(
-    @GetUser('id') userDeletedBy: number,
-    @Param('id', ParseIntPipe) id: number,
+    @GetUser('id') userDeletedBy: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @TransactionParam() transaction: Transaction,
   ) {
     return this.userService.delete(userDeletedBy, id, transaction);

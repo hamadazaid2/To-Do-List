@@ -7,23 +7,24 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 })
 export class User extends Model<User> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUIDV4,
     allowNull: false,
+    defaultValue: DataType.UUIDV4, // Generate a UUID v4 as the default value
     primaryKey: true,
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  first_name: string;
+  firstName: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  last_name: string;
+  lastName: string;
 
   @Column({
     type: DataType.STRING,
@@ -46,36 +47,37 @@ export class User extends Model<User> {
 
   @Column({
     type: DataType.INTEGER,
+    allowNull: true,
   })
-  created_by: number;
+  createdBy: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-  updated_by: number;
+  updatedBy: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-  deleted_by: number;
+  deletedBy: string;
 
   @Column({
     type: DataType.DATE,
     defaultValue: new Date(),
   })
-  created_at: Date;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  updated_at: Date;
+  createdAt: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  deleted_at: Date;
+  updatedAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
 }

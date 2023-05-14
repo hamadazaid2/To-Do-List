@@ -1,6 +1,14 @@
 const path = require('path');
+
+
+// require('ts-node').register({
+//     transpileOnly: true,
+//     project: path.resolve('tsconfig.json'), // Path to your tsconfig.json file
+// });
+
+
 module.exports = {
-    'seeders-path': path.resolve('src/database', 'seeders'),
-    'migrations-path': path.resolve('src/database', 'migrations'),
-    'config': path.resolve('src/database', 'config.js'),
+    'seeders-path': path.resolve('src/db', 'seeders'),
+    'migrations-path': path.resolve('src/db', 'migrations'),
+    'config': path.resolve('src', 'db', 'config.js'), // Path to your config.ts file
 }

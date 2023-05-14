@@ -4,9 +4,9 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Add the foreign key column to the Task table
     await queryInterface.addColumn('tasks', 'user_id', {
-      type: Sequelize.INTEGER,
+      type: Sequelize.UUID,
       references: {
-        model: 'Users',
+        model: 'users',
         key: 'id',
       },
       onUpdate: 'CASCADE',

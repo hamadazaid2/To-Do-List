@@ -23,8 +23,9 @@ import { User } from '../../users/entities/users.entity';
 })
 export class Task extends Model<Task> {
   @Column({
-    type: DataType.UUID,
+    type: DataType.UUIDV4,
     allowNull: false,
+    defaultValue: DataType.UUIDV4, // Generate a UUID v4 as the default value
     primaryKey: true,
   })
   id: string;
@@ -55,7 +56,7 @@ export class Task extends Model<Task> {
   priority: number;
 
   @Column
-  expected_working_minutes: number;
+  expectedWorkingMinutes: number;
 
   @Column({
     type: DataType.ENUM,
@@ -68,42 +69,42 @@ export class Task extends Model<Task> {
   user: User;
 
   @ForeignKey(() => User)
-  user_id: number;
+  userId: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
   })
-  created_by: number;
+  createdBy: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
   })
-  updated_by: number;
+  updatedBy: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
   })
-  deleted_by: number;
+  deletedBy: string;
 
   @Column({
     type: DataType.DATE,
     defaultValue: new Date(),
   })
-  created_at: Date;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  updated_at: Date;
+  createdAt: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  deleted_at: Date;
+  updatedAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
 
   // Apply default scope ;)
   static readonly defaultScope = {

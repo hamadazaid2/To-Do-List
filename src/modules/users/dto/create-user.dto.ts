@@ -9,11 +9,11 @@ import {
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  first_name: string;
+  firstName: string;
 
   @IsString()
   @IsNotEmpty()
-  last_name: string;
+  lastName: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -25,6 +25,6 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  @IsEnum(['user', 'role'])
+  @IsEnum(['user', 'admin'], {message: 'Role must be either \'admin\' or \'user\''})
   role?: string;
 }
