@@ -1,8 +1,6 @@
 import {
   ForbiddenException,
   Injectable,
-  NotFoundException,
-  UseInterceptors,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
@@ -10,6 +8,8 @@ import { SignupDto } from '../dto';
 import { UsersService } from '../../users/services/users.service';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Transaction } from 'sequelize';
+import { User } from 'src/modules/users/entities/users.entity';
+import { UpdatedUserDto } from '../dto/update-me.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,9 +19,9 @@ export class AuthService {
   ) {}
 
   async signup(
-    @GetUser('id') userCreatedId: number,
     dto: SignupDto,
     transaction: Transaction,
+    @GetUser('id') userCreatedId?: string,
   ) {
     // Generate (hash) the password
     dto.password = await argon.hash(dto.password);
@@ -33,7 +33,8 @@ export class AuthService {
         { ...dto },
         transaction,
       );
-      return this.signToken(user.id, user.email);
+      const token =await this.signToken(user.id, user.email);
+      return{user ,access_token: token.access_token}
     } catch (err) {
       throw err;
     }
@@ -42,7 +43,7 @@ export class AuthService {
   async signin(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new NotFoundException('No user with that email!');
+      throw new ForbiddenException('Credentials incorrect!');
     }
     // Compare password
     const passMatches = await argon.verify(user.password, password);
@@ -55,7 +56,7 @@ export class AuthService {
   }
 
   async signToken(
-    id: number,
+    id: string,
     email: string,
   ): Promise<{ access_token: string }> {
     const payload = {
@@ -68,5 +69,12 @@ export class AuthService {
     return {
       access_token: token,
     };
+  }
+
+  async updateMe(user: User, dto: UpdatedUserDto, transaction:Transaction){
+    return this.userService.update(user.id, user.id, dto, transaction);
+  }
+  async deleteMe(user: User, transaction: Transaction){
+    return this.userService.delete(user.id,user.id, transaction)
   }
 }

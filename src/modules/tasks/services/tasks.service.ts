@@ -1,7 +1,8 @@
 import {
   Body,
   Param,
-  ParseIntPipe,
+  HttpStatus,
+  HttpCode,
   NotFoundException,
   Inject,
 } from '@nestjs/common';
@@ -18,18 +19,18 @@ export class TasksService {
   constructor(@Inject(TASKS_REPOSITORY) private taskRepository: typeof Task) {}
   async getAll(userId: number) {
     return await this.taskRepository.scope('withUser').findAll({
-      where: { user_id: userId },
+      where: { userId: userId },
       include: [
         { model: User, attributes: ['id', 'first_name', 'last_name', 'email'] },
       ],
     });
   }
 
-  async getOne(id: number, userId: number) {
+  async getOne(id: string, userId: string) {
     const task = await this.taskRepository.scope('withUser').findOne({
       where: {
         id: id,
-        user_id: userId,
+        userId: userId,
       },
       include: [{ model: User }],
     });
@@ -38,52 +39,53 @@ export class TasksService {
     return task;
   }
 
-  create(@Body() dto: CreateTaskDto, userId: number, transaction: Transaction) {
+  create(@Body() dto: CreateTaskDto, userId: string, transaction: Transaction) {
     return this.taskRepository.create(
       {
         ...dto,
-        user_id: userId,
-        created_by: userId,
+        userId: userId,
+        createdBy: userId,
       },
       { transaction },
     );
   }
 
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() dto: UpdateTaskDto,
-    userId: number,
+    userId: string,
     transaction: Transaction,
   ) {
     const task = await this.taskRepository.findOne({
       where: {
         id: id,
-        user_id: userId,
+        userId: userId,
       },
     });
     if (!task) throw new NotFoundException(`Task with ID ${id} not found`);
 
     await task.update(
-      { ...dto, updated_by: userId, updated_at: new Date() },
+      { ...dto, updatedBy: userId, updatedAt: new Date() },
       { transaction },
     );
 
     return task;
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
-    @Param('id', ParseIntPipe) id: number,
-    userId: number,
+    id: string,
+    userId: string,
     transaction: Transaction,
   ) {
     const task = await this.taskRepository.findOne({
       where: {
         id: id,
-        user_id: userId,
+        userId: userId,
       },
     });
     if (!task) throw new NotFoundException(`Task with ID ${id} not found`);
-    await task.update({ deleted_by: userId }, { transaction });
+    await task.update({ deletedBy: userId }, { transaction });
     await task.destroy({ transaction });
   }
 }

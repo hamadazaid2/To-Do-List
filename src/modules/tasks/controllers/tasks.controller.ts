@@ -6,9 +6,8 @@ import {
   Patch,
   Post,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   UseGuards,
-  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { Transaction } from 'sequelize';
@@ -31,7 +30,9 @@ export class TasksController {
   }
 
   @Get('/:id')
-  getOne(@Param('id', ParseIntPipe) id: number, @GetUser('id') userId: number) {
+  getOne(@Param('id', ParseUUIDPipe) id: string, @GetUser('id') userId: string) {
+    console.log('TASK ID: ', id);
+    console.log('USER ID: ', userId);
     return this.tasksService.getOne(id, userId);
   }
 
@@ -39,7 +40,7 @@ export class TasksController {
   @Post()
   create(
     @Body() dto: CreateTaskDto,
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @TransactionParam() transaction: Transaction,
   ) {
     return this.tasksService.create(dto, userId, transaction);
@@ -48,9 +49,9 @@ export class TasksController {
   @UseInterceptors(TransactionInterceptor)
   @Patch('/:id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateTaskDto,
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @TransactionParam() transaction: Transaction,
   ) {
     return this.tasksService.update(id, dto, userId, transaction);
@@ -59,8 +60,8 @@ export class TasksController {
   @UseInterceptors(TransactionInterceptor)
   @Delete('/:id')
   delete(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser('id') userId: number,
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('id') userId: string,
     @TransactionParam() transaction: Transaction,
   ) {
     return this.tasksService.delete(id, userId, transaction);

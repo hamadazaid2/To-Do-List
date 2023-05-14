@@ -27,10 +27,12 @@ export class UpdateTaskDto {
   @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsOptional()
-  expected_working_minutes?: number;
+  expectedWorkingMinutes?: number;
 
   @Transform(({ value }) => String(value).toUpperCase())
-  @IsEnum(['QA', 'DONE', 'WAITING', 'IN PROGRESS'])
+  @IsEnum(['QA', 'DONE', 'WAITING', 'IN PROGRESS'], {
+    message: 'Status must be one of the following: [QA, DONE, WAITING, IN PROGRESS]'
+  })
   @IsOptional()
   status?: string;
 }

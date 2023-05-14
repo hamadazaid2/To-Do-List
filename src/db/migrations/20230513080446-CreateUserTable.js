@@ -5,10 +5,8 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.createTable('users', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
-        autoIncrement: true,
-        unique: true,
         primaryKey: true
       },
       first_name: {
@@ -36,12 +34,10 @@ module.exports = {
       updated_at: {
         allowNull: true,
         type: Sequelize.DATE,
-        // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       deleted_at: {
         allowNull: true,
         type: Sequelize.DATE,
-        // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       created_by: {
         allowNull: true,

@@ -12,11 +12,11 @@ export class EditUserDto {
 
   @IsString()
   @IsOptional()
-  first_name?: string;
+  firstName?: string;
 
   @IsString()
   @IsOptional()
-  last_name?: string;
+  lastName?: string;
 
   @IsString()
   @IsOptional()
@@ -24,5 +24,5 @@ export class EditUserDto {
   role?: string;
 
   @IsOptional()
-  updated_by?: number;
+  updatedBy?: number;
 }
