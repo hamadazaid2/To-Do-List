@@ -20,8 +20,9 @@ import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { Transaction } from 'sequelize';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
 import { Serialize } from '../../../common/interceptors';
+import { UpdatePassword } from '../dto/update-password.dto';
 
-@Serialize(UserDto)
+// @Serialize(UserDto)
 @UseGuards(AuthGuard, AdminGuard)
 @Controller('users')
 export class UsersController {
@@ -57,6 +58,17 @@ export class UsersController {
     return this.userService.update(userUpdatedId, id, dto, transaction);
   }
 
+  @UseInterceptors(TransactionInterceptor)
+  @Patch('/updatePassword/:id')
+  updatePassword(
+    @GetUser('id') userUpdatedId,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdatePassword,
+    @TransactionParam() transaction: Transaction,
+  ) {
+    return this.userService.updatedPassword(userUpdatedId, id, dto.password, transaction)
+  }
+  
   @UseInterceptors(TransactionInterceptor)
   @Delete('/:id')
   delete(

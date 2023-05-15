@@ -10,6 +10,7 @@ import { User } from 'src/modules/users/entities/users.entity';
 import { Serialize } from 'src/common/interceptors';
 import { UserDto } from 'src/modules/users/dto';
 import { UpdatedUserDto } from '../dto/update-me.dto';
+import { UpdatePassword } from '../dto/update-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,6 +40,12 @@ export class AuthController {
   updatedMe(@GetUser() user: User, @Body() dto: UpdatedUserDto, transaction: Transaction){
     return this.authService.updateMe(user, dto,transaction )
   }
+  @UseInterceptors(TransactionInterceptor)
+  @Patch('me/updatePassword')
+  updateMyPassword(@GetUser() user: User, @Body() dto: UpdatePassword, transaction: Transaction){
+    return this.authService.updateMyPassword(user, dto.password, transaction)
+  }
+  
 
   @UseInterceptors(TransactionInterceptor)
   @Delete('me')

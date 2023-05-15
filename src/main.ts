@@ -5,6 +5,7 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { Reflector } from '@nestjs/core';
 import { UsersService } from './modules/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,11 +16,13 @@ async function bootstrap() {
   );
 
   const reflector = app.get(Reflector);
-  const userService = app.get(UsersService);
   const jwtService = app.get(JwtService);
-  const authGuard = app.get(AuthGuard);
+  const userService = app.get(UsersService);
+  const configService = app.get(ConfigService);
 
-  app.useGlobalGuards(authGuard);
+  app.useGlobalGuards(
+    new AuthGuard(userService, jwtService, reflector, configService),
+  );
 
   await app.listen(3000);
 }

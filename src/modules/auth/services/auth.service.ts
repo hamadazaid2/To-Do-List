@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  NotFoundException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
@@ -41,17 +42,15 @@ export class AuthService {
   }
 
   async signin(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmail(email, true);
     if (!user) {
       throw new ForbiddenException('Credentials incorrect!');
     }
     // Compare password
     const passMatches = await argon.verify(user.password, password);
-
     // If password incorrecr throw exception
     if (!passMatches) throw new ForbiddenException('Credentials incorrect!');
     // Send back the user
-
     return this.signToken(user.id, user.email);
   }
 
@@ -74,6 +73,11 @@ export class AuthService {
   async updateMe(user: User, dto: UpdatedUserDto, transaction:Transaction){
     return this.userService.update(user.id, user.id, dto, transaction);
   }
+
+  async updateMyPassword(user: User, password: string, transaction: Transaction){
+    return this.userService.updatedPassword(user.id, user.id, password, transaction);
+  }
+
   async deleteMe(user: User, transaction: Transaction){
     return this.userService.delete(user.id,user.id, transaction)
   }
